@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	html, body
+	{
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+	#map
+	{
+		margin:10px;
+	}
+</style>
+<script>
+	require([
+	"esri/map",
+	"esri/layers/FeatureLayer",
+	"esri/symbols/SimpleFillSymbol",
+	"esri/Color",
+	"esri/symbols/SimpleLineSymbol",
+	"esri/graphic",
+	"dojo/domReady!"],
+	function(
+		Map,
+		FeatureLayer,
+		SimpleFillSymbol,
+		Color,
+		SimpleLineSymbol,
+		Graphic)
+	{
+			$("document").ready(function()
+			{
+			var page3Map = new Map("map",
+			{
+				basemap: "topo",
+				extent: window.copyExtent
+			});
+			
+			page3LayerURL = window.url + "/" + window.visibleLayer;
+			var page3Layer = new FeatureLayer(page3LayerURL);
+			
+			page3Map.on("load",function()
+			{
+				page3Map.addLayers([page3Layer]);
+				page3Map.on("click",citySDKQuery);
+			});
+			
+			function citySDKQuery(evt)
+			{
+				var sdk = new CitySDK();
+				var censusModule = sdk.modules.census;
+				censusModule.enable("315210ddaf6505f170cb116e16d5a1ec69ffe699");
+				var tempVars = $(":checked");
+				var censusVars = [];
+				
+				for (i=0; i<tempVars.length; i++)
+				{
+					censusVars.push(tempVars[i].value)
+				}
+
+				if (typeof polyGraphic != 'undefined')
+				{
+					page3Map.graphics.remove(polyGraphic);
+				}
+				
+				var lat = evt.mapPoint.getLatitude();
+				var lng = evt.mapPoint.getLongitude();
+				
+				var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_DIAGONAL_CROSS,
+				new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+				new Color([255,0,0]), 2),new Color([255,255,0,0.25]));
+				polyGraphic = new Graphic(evt.graphic.geometry, sfs);
+				
+				page3Map.graphics.add(polyGraphic);
+				
+				var request = 
+				{
+					"lat":lat,
+					"lng":lng,
+					"level":"tract",
+					"container":"state",
+					"variables":censusVars
+				}
+				
+				censusModule.APIRequest(request,function(response)
+				{
+					console.log(response);
+				});
+			}
+		});
+	});
+	
+</script>
+
+
+</head>
+
+	<body class="claro">
+		<div id="censusVariables">
+			<p>Now that we have the geometry, we need to specify the variables that we want to get 
+			from the Census data queryEam ad audiam aliquam, no sea hinc dicat efficiendi, 
+			ne impedit sapientem sed. Nec ex reque scaevola, vis ne intellegat maiestatis, ex dicant assentior sit. 
+			At reque altera partiendo mea. Ne esse luptatum delicata sed, nobis audiam utamur eam cu. 
+			Tota qualisque dissentias eu vel, audiam propriae qui ei. Et enim integre detraxit pro. 
+			Vix essent commodo et, elit labitur iracundia ad sed. Ut sed harum tation labore, dicit iudico ea mei. 
+			Suas unum periculis cu sea. Mei movet civibus sadipscing ei, nominavi instructior sea ei. 
+			Labore virtute invenire usu ut, his at errem splendide. Dicat civibus qui at, eu pro dicit simul homero. 
+			Per nullam signiferumque no, semper complectitur has cu. </p>
+			<br>
+			<table>
+				<tr>
+					<td><input type="checkbox" name="variable" value="population">Total Population</td>
+					<td><input type="checkbox" name="variable" value="income">Median Household Income</td>
+					<td><input type="checkbox" name="variable" value="employment_unemployed">Unemployed (16&Older)</td>
+					<td><input type="checkbox" name="variable" value="poverty_family">Poverty (Families)</td>
+				</tr>
+			</table>
+			<br>
+			<button id="next1">Next</button>
+		</div>
+		<div id="map"></map>
+	</body>
+</html>
