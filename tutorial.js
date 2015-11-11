@@ -59,24 +59,27 @@ require([
 				{
 					if($("input[name='variable']:checked").length>0)
 					{
+						
 						var sdk = new CitySDK();
 						var censusModule = sdk.modules.census;
 						censusModule.enable("315210ddaf6505f170cb116e16d5a1ec69ffe699");
 						var tempVars = $(":checked");
 						var censusVars = [];
-					
+						
+						var lat = evt.mapPoint.getLatitude();
+						var lng = evt.mapPoint.getLongitude();
+						
 						for (i=0; i<tempVars.length; i++)
 						{
-							censusVars.push(tempVars[i].value)
+							censusVars.push(tempVars[i].value);
+							$("#results > tbody:last-child").append("<tr id="+censusVars[i]+"><td>" + tempVars[i].nextSibling.data + "</td><td></td></tr>");
+							console.log(tempVars[i].nextSibling.data);
 						}
 						
 						if (typeof polyGraphic != 'undefined')
 						{
 							map.graphics.remove(polyGraphic);
 						}
-						
-						var lat = evt.mapPoint.getLatitude();
-						var lng = evt.mapPoint.getLongitude();
 						
 						var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_DIAGONAL_CROSS,
 						new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
@@ -86,18 +89,29 @@ require([
 						map.graphics.add(polyGraphic);
 						
 						var request = 
-						{
-							"lat":lat,
-							"lng":lng,
-							"level":"tract",
-							"container":"state",
-							"variables":censusVars
-						}
-						
+							{
+								"lat":lat,
+								"lng":lng,
+								"level":"tract",
+								"container":"state",
+								"variables":censusVars
+							}
 						censusModule.APIRequest(request,function(response)
 						{
 							console.log(response);
-						});
+							for(i=0; i<response.variables.length; i++)
+							{
+								for(i=0; i<response.variables.length; i++)
+								{
+									if(response.variables[i] == censusVars[i])
+									{
+										var y = response.variables[i];
+										var dataCell = $("#"+censusVars[i]).children().last();
+										dataCell[0].innerText = response.data[0][y];
+									}
+								}
+							}
+						});	
 					}
 				}
 				
@@ -185,7 +199,7 @@ require([
 						var html = $.parseHTML(temp);
 						console.log(html);
 						$("#aboveMap").empty().append(html[0]);
-						$("#belowMap").empty().append(html[2]).append(html[3]);
+						$("#belowMap").empty().append(html[2]).append(html[3]).append(html[7]);
 					})
 					.done(function()
 					{	
@@ -194,11 +208,4 @@ require([
 					{	
 					});
 				}
-				
-				/*$("#nextPage").click(nextPage);
-				function nextPage()
-				{
-					console.log(x);
-					functionList[x]();
-				}*/
 			});
