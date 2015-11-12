@@ -115,11 +115,14 @@ require([
 					}
 				}
 				
-				$("body").on("click",".myBtn",function (evt)
+				$("body").on("click",".myBtn", function (evt)
 				{
+					
+					$("firsttag").remove();
 					switch(evt.currentTarget.id)
 					{
 						case "addLayer":
+
 							var url = $("input[name='urlInput']")[0].value;
 							var visibleLayer = $("input:checked")[0].value;
 							var featureLayerUrl = url + "/" + visibleLayer;
@@ -129,10 +132,12 @@ require([
 							}
 							layer = new FeatureLayer(featureLayerUrl);
 							map.addLayers([layer]);
-							$("#nextPage").removeAttr("disabled");
+							
+							$("firsttag").remove();
 							break;
 						
 						case "getData":
+							console.log("in get data");
 							esriConfig.defaults.io.corsEnabledServers.push($("input[name='urlInput']")[0].value);
 							var requestHandle = esriRequest(
 							{
@@ -152,6 +157,7 @@ require([
 									var sublayerBtn = "<input type='radio' name='sublayer' value=" +i+ ">"+response.layers[i].name+"<br>";
 									$("#belowMap").append(sublayerBtn);
 								}
+								$("firsttag").remove();
 								$("#belowMap").append("<button id='addLayer' class='myBtn' disabled>Add Layer</button>").append("<button id='nextPage' class='myBtn' disabled>Continue: Select Census Attributes</button>");
 							}, function(error)
 							{
@@ -178,6 +184,7 @@ require([
 					{
 						var temp = $.trim(data);
 						var html = $.parseHTML(temp);
+						console.log(html);
 						$("#aboveMap").empty().append(html[0]);
 						$("#belowMap").empty().append(html[2]);
 						//$("[name='urlInput']").removeAttr("disabled");
