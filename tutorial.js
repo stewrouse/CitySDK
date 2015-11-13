@@ -133,7 +133,7 @@ require([
 							layer = new FeatureLayer(featureLayerUrl);
 							map.addLayers([layer]);
 							
-							$("firsttag").remove();
+							$("#nextPage").removeAttr("disabled");
 							break;
 						
 						case "getData":
@@ -155,9 +155,11 @@ require([
 									console.log(response.layers[i].name);
 									var subLayerName = response.layers[i].name;
 									var sublayerBtn = "<input type='radio' name='sublayer' value=" +i+ ">"+response.layers[i].name+"<br>";
+									// $("#belowMap").append("<p>here is some text</p>");
 									$("#belowMap").append(sublayerBtn);
 								}
 								$("firsttag").remove();
+
 								$("#belowMap").append("<button id='addLayer' class='myBtn' disabled>Add Layer</button>").append("<button id='nextPage' class='myBtn' disabled>Continue: Select Census Attributes</button>");
 							}, function(error)
 							{
