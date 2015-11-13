@@ -96,6 +96,7 @@ require([
 								"container":"state",
 								"variables":censusVars
 							}
+						console.log("before request");
 						censusModule.APIRequest(request,function(response)
 						{
 							console.log(response);
@@ -177,7 +178,7 @@ require([
 				{
 					$("#addLayer").removeAttr("disabled");
 				});
-				
+
 				var x=0;
 				var functionList=[];
 				functionList[0] = function toPage2()
